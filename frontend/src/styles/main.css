@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+	--bg: #f8fafc;
+	--surface: #ffffff;
+	--muted: #6b7280;
+	--accent: #2563eb;
+	--brand: #0ea5a4;
+}
+
+@layer base {
+	html,body,#root { height: 100%; }
+	body { @apply bg-gray-50 text-gray-800; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; }
+	h1,h2,h3,h4 { letter-spacing: -0.01em; }
+}
+
+@layer components {
+	.container-max { max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+	.card { @apply bg-white rounded-lg-2 shadow-card-lg p-6; }
+	.btn-primary { @apply bg-primary text-white px-4 py-2 rounded hover:bg-primary-600 transition-colors; }
+}
+
+/* minor utilities */
+.muted { color: var(--muted); }
+.kbd { @apply inline-block bg-gray-100 px-2 py-0.5 rounded text-xs border border-gray-200; }
+
+/* keep body background consistent */
+body { background-color: var(--bg); }
