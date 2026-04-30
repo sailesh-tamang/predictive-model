@@ -8,3 +8,4 @@ joblib
 gunicorn
 shap
 matplotlib
+gunicorn
