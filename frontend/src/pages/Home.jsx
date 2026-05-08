@@ -1,7 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function Home(){
+  const navigate = useNavigate()
   return (
     <div>
       {/* Hero Section */}
@@ -166,25 +167,28 @@ export default function Home(){
 
       {/* Resources */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Link to="/dashboard" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+        <div className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer" onClick={() => navigate('/dashboard')}>
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <span className="text-2xl mr-2">📊</span>
             Dashboard
           </h3>
           <p className="text-sm text-gray-600">View season analysis, team statistics, and crowd impact metrics</p>
-        </Link>
-        <Link to="/shap" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+        </div>
+        <div className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer" onClick={() => navigate('/shap')}>
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <span className="text-2xl mr-2">🔍</span>
             SHAP Analysis
           </h3>
           <p className="text-sm text-gray-600">Explore feature importance and individual prediction explanations</p>
-        </Link>
-        <Link to="/about" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+        </div>
+        <div className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer" onClick={() => navigate('/about')}>
           <h3 className="font-semibold text-lg mb-2 flex items-center">
             <span className="text-2xl mr-2">📚</span>
             Research
           </h3>
           <p className="text-sm text-gray-600">Deep dive into the thesis methodology and research findings</p>
-        </Link>
+        </div>
       </section>
+    </div>
+  )
+}
