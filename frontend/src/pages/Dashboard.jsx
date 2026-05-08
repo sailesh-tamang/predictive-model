@@ -3,6 +3,36 @@ import axios from 'axios'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
+// Image Skeleton Loader
+function ImageLoader() {
+  return <div className="w-full h-64 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-pulse"></div>
+}
+
+// Image Component with Lazy Loading
+function LazyImage({ src, alt, onClick }) {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+
+  if (error) {
+    return <div className="text-sm text-gray-500 py-8 text-center bg-gray-100 rounded">Image failed to load</div>
+  }
+
+  return (
+    <>
+      {!loaded && <ImageLoader />}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        className={`w-full rounded cursor-pointer hover:opacity-90 transition-opacity ${!loaded ? 'hidden' : ''}`}
+        onClick={onClick}
+      />
+    </>
+  )
+}
+
 export default function Dashboard(){
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(true)
@@ -10,7 +40,13 @@ export default function Dashboard(){
 
   useEffect(()=>{
     setLoading(true)
-    axios.get(`${API}/images/list`).then(r=> setImages(r.data.images || [])).catch(()=>{}).finally(()=> setLoading(false))
+    axios.get(`${API}/images/list`, { timeout: 10000 })
+      .then(r => setImages(r.data.images || []))
+      .catch(err => {
+        console.error('Failed to load images:', err)
+        setImages([])
+      })
+      .finally(() => setLoading(false))
   },[])
 
   const find = (name) => images.find(x=> x.toLowerCase().includes(name))
@@ -50,28 +86,28 @@ export default function Dashboard(){
             <div className="rounded-lg p-4 bg-gray-50">
               <h3 className="font-semibold mb-3 text-gray-800">Season Analysis</h3>
               {find('season') ? (
-                <img src={`${API}/images/${find('season')}`} alt="season" className="w-full rounded cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage({src: `${API}/images/${find('season')}`, alt: 'Season Analysis'})} />
+                <LazyImage src={`${API}/images/${find('season')}`} alt="season" onClick={() => setZoomedImage({src: `${API}/images/${find('season')}`, alt: 'Season Analysis'})} />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Chart not available</div>}
             </div>
 
             <div className="rounded-lg p-4 bg-gray-50">
               <h3 className="font-semibold mb-3 text-gray-800">Team Analysis</h3>
               {find('team_analysis') ? (
-                <img src={`${API}/images/${find('team_analysis')}`} alt="team" className="w-full rounded cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage({src: `${API}/images/${find('team_analysis')}`, alt: 'Team Analysis'})} />
+                <LazyImage src={`${API}/images/${find('team_analysis')}`} alt="team" onClick={() => setZoomedImage({src: `${API}/images/${find('team_analysis')}`, alt: 'Team Analysis'})} />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Chart not available</div>}
             </div>
 
             <div className="rounded-lg p-4 bg-gray-50">
               <h3 className="font-semibold mb-3 text-gray-800">Crowd Impact</h3>
               {find('crowd_impact') ? (
-                <img src={`${API}/images/${find('crowd_impact')}`} alt="crowd impact" className="w-full rounded cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage({src: `${API}/images/${find('crowd_impact')}`, alt: 'Crowd Impact'})} />
+                <LazyImage src={`${API}/images/${find('crowd_impact')}`} alt="crowd impact" onClick={() => setZoomedImage({src: `${API}/images/${find('crowd_impact')}`, alt: 'Crowd Impact'})} />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Chart not available</div>}
             </div>
 
             <div className="rounded-lg p-4 bg-gray-50">
               <h3 className="font-semibold mb-3 text-gray-800">Team Scatter</h3>
               {find('team_scatter') ? (
-                <img src={`${API}/images/${find('team_scatter')}`} alt="team scatter" className="w-full rounded cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setZoomedImage({src: `${API}/images/${find('team_scatter')}`, alt: 'Team Scatter'})} />
+                <LazyImage src={`${API}/images/${find('team_scatter')}`} alt="team scatter" onClick={() => setZoomedImage({src: `${API}/images/${find('team_scatter')}`, alt: 'Team Scatter'})} />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Chart not available</div>}
             </div>
           </div>

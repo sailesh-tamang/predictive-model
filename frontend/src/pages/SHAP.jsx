@@ -3,13 +3,48 @@ import axios from 'axios'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
+// Image Skeleton Loader
+function ImageLoader() {
+  return <div className="w-full h-64 bg-gradient-to-r from-gray-200 to-gray-300 rounded animate-pulse"></div>
+}
+
+// Image Component with Lazy Loading
+function LazyImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+
+  if (error) {
+    return <div className="text-sm text-gray-500 py-8 text-center bg-gray-100 rounded">Image failed to load</div>
+  }
+
+  return (
+    <>
+      {!loaded && <ImageLoader />}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        className={`w-full rounded border border-gray-300 ${!loaded ? 'hidden' : ''}`}
+      />
+    </>
+  )
+}
+
 export default function SHAP(){
   const [images, setImages] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(()=>{
     setLoading(true)
-    axios.get(`${API}/images/list`).then(r=> setImages(r.data.images || [])).catch(()=>{}).finally(()=> setLoading(false))
+    axios.get(`${API}/images/list`, { timeout: 10000 })
+      .then(r => setImages(r.data.images || []))
+      .catch(err => {
+        console.error('Failed to load images:', err)
+        setImages([])
+      })
+      .finally(() => setLoading(false))
   },[])
 
   const find = (name) => images.find(x=> x.toLowerCase().includes(name))
@@ -28,7 +63,7 @@ export default function SHAP(){
               <h3 className="font-semibold mb-2 text-gray-800">SHAP Summary Plot</h3>
               <p className="text-xs text-gray-600 mb-3">Shows the impact of each feature on model output. Points colored by feature value (red=high, blue=low).</p>
               {find('shap_summary') ? (
-                <img src={`${API}/images/${find('shap_summary')}`} alt="shap summary" className="w-full rounded border border-gray-300" />
+                <LazyImage src={`${API}/images/${find('shap_summary')}`} alt="shap summary" />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Plot not available</div>}
             </div>
 
@@ -36,7 +71,7 @@ export default function SHAP(){
               <h3 className="font-semibold mb-2 text-gray-800">SHAP Bar Plot (Feature Importance)</h3>
               <p className="text-xs text-gray-600 mb-3">Shows mean absolute SHAP values - the most important features for predictions are at the top.</p>
               {find('shap_bar') ? (
-                <img src={`${API}/images/${find('shap_bar')}`} alt="shap bar" className="w-full rounded border border-gray-300" />
+                <LazyImage src={`${API}/images/${find('shap_bar')}`} alt="shap bar" />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Plot not available</div>}
             </div>
 
@@ -44,7 +79,7 @@ export default function SHAP(){
               <h3 className="font-semibold mb-2 text-gray-800">Crowd Presence Impact on SHAP Values</h3>
               <p className="text-xs text-gray-600 mb-3">Analysis of how the crowd presence feature affects model predictions and feature importance rankings.</p>
               {find('shap_crowd') ? (
-                <img src={`${API}/images/${find('shap_crowd')}`} alt="shap crowd" className="w-full rounded border border-gray-300" />
+                <LazyImage src={`${API}/images/${find('shap_crowd')}`} alt="shap crowd" />
               ) : <div className="text-sm text-gray-500 py-8 text-center">Plot not available</div>}
             </div>
           </div>
