@@ -6,7 +6,7 @@ import './styles/main.css'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/predictive-model">
       <App />
     </BrowserRouter>
   </React.StrictMode>
