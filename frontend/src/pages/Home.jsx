@@ -75,21 +75,21 @@ export default function Home(){
 
       {/* Key Findings Stats */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="p-6 rounded-lg bg-gray-100">
-          <div className="text-3xl font-bold text-blue-600">5.5%</div>
-          <p className="text-xs text-gray-600 mt-2">Home Win Rate Drop Without Crowd</p>
+        <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:shadow-lg transition-shadow">
+          <div className="text-4xl font-bold text-blue-700">5.5%</div>
+          <p className="text-sm text-blue-600 mt-3 font-medium">Home Win Rate Drop Without Crowd</p>
         </div>
-        <div className="p-6 rounded-lg bg-gray-100">
-          <div className="text-3xl font-bold text-blue-600">32.2%</div>
-          <p className="text-xs text-gray-600 mt-2">Liverpool's HFA Drop (Biggest)</p>
+        <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-red-100 border border-red-200 hover:shadow-lg transition-shadow">
+          <div className="text-4xl font-bold text-red-700">32.2%</div>
+          <p className="text-sm text-red-600 mt-3 font-medium">Liverpool's HFA Drop (Biggest)</p>
         </div>
-        <div className="p-6 rounded-lg bg-gray-100">
-          <div className="text-3xl font-bold text-blue-600">9.5%</div>
-          <p className="text-xs text-gray-600 mt-2">Prediction Drop Without Crowd (SHAP)</p>
+        <div className="p-6 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:shadow-lg transition-shadow">
+          <div className="text-4xl font-bold text-green-700">9.5%</div>
+          <p className="text-sm text-green-600 mt-3 font-medium">Prediction Drop Without Crowd (SHAP)</p>
         </div>
-        <div className="p-6 rounded-lg bg-gray-100">
-          <div className="text-3xl font-bold text-blue-600">74.3%</div>
-          <p className="text-xs text-gray-600 mt-2">Model Accuracy</p>
+        <div className="p-6 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:shadow-lg transition-shadow">
+          <div className="text-4xl font-bold text-purple-700">74.3%</div>
+          <p className="text-sm text-purple-600 mt-3 font-medium">Model Accuracy</p>
         </div>
       </section>
 
@@ -125,6 +125,66 @@ export default function Home(){
           </ul>
         </div>
       </section>
-    </div>
-  )
-}
+
+      {/* How It Works */}
+      <section className="mb-6">
+        <h2 className="text-3xl font-bold mb-6 text-center">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="card bg-gradient-to-br from-blue-50 to-transparent">
+            <div className="text-3xl font-bold text-blue-600 mb-3">1️⃣</div>
+            <h3 className="font-semibold mb-2">Enter Match Stats</h3>
+            <p className="text-sm text-gray-600">Input home and away team statistics for any match</p>
+          </div>
+          <div className="card bg-gradient-to-br from-green-50 to-transparent">
+            <div className="text-3xl font-bold text-green-600 mb-3">2️⃣</div>
+            <h3 className="font-semibold mb-2">AI Prediction</h3>
+            <p className="text-sm text-gray-600">XGBoost model predicts match outcome (H/D/A)</p>
+          </div>
+          <div className="card bg-gradient-to-br from-purple-50 to-transparent">
+            <div className="text-3xl font-bold text-purple-600 mb-3">3️⃣</div>
+            <h3 className="font-semibold mb-2">SHAP Explanation</h3>
+            <p className="text-sm text-gray-600">See exactly which factors influenced the prediction</p>
+          </div>
+          <div className="card bg-gradient-to-br from-orange-50 to-transparent">
+            <div className="text-3xl font-bold text-orange-600 mb-3">4️⃣</div>
+            <h3 className="font-semibold mb-2">Crowd Impact</h3>
+            <p className="text-sm text-gray-600">Understand crowd's contribution to home advantage</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="card bg-gradient-to-r from-blue-600 to-blue-700 text-white mb-6">
+        <div className="text-center py-8">
+          <h2 className="text-3xl font-bold mb-3">Ready to Predict?</h2>
+          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">Enter match statistics and discover how crowd presence influences Premier League outcomes with AI-powered predictions and SHAP explainability.</p>
+          <Link to="/predict" className="inline-block px-8 py-3 rounded-lg bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors">
+            Get Started with Predictions
+          </Link>
+        </div>
+      </section>
+
+      {/* Resources */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Link to="/dashboard" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+          <h3 className="font-semibold text-lg mb-2 flex items-center">
+            <span className="text-2xl mr-2">📊</span>
+            Dashboard
+          </h3>
+          <p className="text-sm text-gray-600">View season analysis, team statistics, and crowd impact metrics</p>
+        </Link>
+        <Link to="/shap" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+          <h3 className="font-semibold text-lg mb-2 flex items-center">
+            <span className="text-2xl mr-2">🔍</span>
+            SHAP Analysis
+          </h3>
+          <p className="text-sm text-gray-600">Explore feature importance and individual prediction explanations</p>
+        </Link>
+        <Link to="/about" className="card hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer">
+          <h3 className="font-semibold text-lg mb-2 flex items-center">
+            <span className="text-2xl mr-2">📚</span>
+            Research
+          </h3>
+          <p className="text-sm text-gray-600">Deep dive into the thesis methodology and research findings</p>
+        </Link>
+      </section>
