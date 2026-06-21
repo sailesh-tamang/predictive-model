@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+import { API } from '../api'
 
 // Image Skeleton Loader
 function ImageLoader() {
@@ -23,7 +22,8 @@ function LazyImage({ src, alt, onClick }) {
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading="eager"
+        decoding="async"
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         className={`w-full rounded cursor-pointer hover:opacity-90 transition-opacity ${!loaded ? 'hidden' : ''}`}
