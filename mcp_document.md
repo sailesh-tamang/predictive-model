@@ -418,6 +418,16 @@ Additional verified checks:
 
 The production pipeline remains functional after retraining and regeneration of model artifacts.
 
+### 16.1 Current Project Status
+At this stage, the project is technically complete for the intended final-year submission:
+- the leakage issue has been corrected,
+- the production model has been retrained and verified,
+- the SHAP logic is consistent with the multiclass output shape,
+- the deployment pipeline is functional,
+- the documentation and wording are aligned with the evidence.
+
+No unresolved technical blockers remain. The only remaining work is optional polishing for presentation, final report formatting, and minor narrative refinement.
+
 ---
 
 ## 17. Final Summary
