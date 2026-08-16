@@ -1,5 +1,8 @@
 # Backend (Flask)
 
+This backend contains the production prediction API for the multiclass model trained on `FTR`.
+The binary `home_win` research model remains in the root project scripts and is not the deployed app model.
+
 Instructions:
 
 1. Create a Python virtual environment and install requirements:
@@ -10,7 +13,7 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-2. Train and save model artifacts (this uses your existing `EPL_cleaned.csv` at repository root):
+2. Train and save the production model artifacts (this uses your existing `EPL_cleaned.csv` at repository root):
 
 ```bash
 python model/save_model.py

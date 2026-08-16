@@ -61,36 +61,36 @@ export default function Home(){
       {/* Key Findings */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="card">
-          <h3 className="font-semibold text-lg mb-2">Crowd Impact on Win Probability</h3>
-          <p className="text-gray-700">Presence of crowd increases home win probability significantly across most seasons, with measurable statistical differences.</p>
+          <h3 className="font-semibold text-lg mb-2">Crowd Presence and Home Advantage</h3>
+          <p className="text-gray-700">The project examines whether home win patterns differ under crowd-present vs no-crowd conditions, using an observational match-level comparison.</p>
         </div>
         <div className="card">
           <h3 className="font-semibold text-lg mb-2">COVID Period Effect</h3>
-          <p className="text-gray-700">No-crowd seasons (2020-21) showed measurable drops in home advantage, providing natural experiment evidence for crowd influence.</p>
+          <p className="text-gray-700">The 2020-21 no-crowd season provides a natural comparison period within the available dataset, but it remains a binary proxy rather than a full attendance model.</p>
         </div>
         <div className="card">
           <h3 className="font-semibold text-lg mb-2">AI Explainability</h3>
-          <p className="text-gray-700">SHAP analysis reveals crowd presence as a key feature for match outcome prediction, with quantifiable contribution values.</p>
+          <p className="text-gray-700">SHAP values are used to show which features contribute to a given match prediction, without claiming causal proof.</p>
         </div>
       </section>
 
       {/* Key Findings Stats */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="p-6 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:shadow-lg transition-shadow">
-          <div className="text-4xl font-bold text-blue-700">5.5%</div>
-          <p className="text-sm text-blue-600 mt-3 font-medium">Home Win Rate Drop Without Crowd</p>
+          <div className="text-4xl font-bold text-blue-700">1</div>
+          <p className="text-sm text-blue-600 mt-3 font-medium">Binary crowd variable used in the research analysis</p>
         </div>
         <div className="p-6 rounded-lg bg-gradient-to-br from-red-50 to-red-100 border border-red-200 hover:shadow-lg transition-shadow">
-          <div className="text-4xl font-bold text-red-700">32.2%</div>
-          <p className="text-sm text-red-600 mt-3 font-medium">Liverpool's HFA Drop (Biggest)</p>
+          <div className="text-4xl font-bold text-red-700">13</div>
+          <p className="text-sm text-red-600 mt-3 font-medium">Model input features in the production prediction pipeline</p>
         </div>
         <div className="p-6 rounded-lg bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:shadow-lg transition-shadow">
-          <div className="text-4xl font-bold text-green-700">9.5%</div>
-          <p className="text-sm text-green-600 mt-3 font-medium">Prediction Drop Without Crowd (SHAP)</p>
+          <div className="text-4xl font-bold text-green-700">3</div>
+          <p className="text-sm text-green-600 mt-3 font-medium">Outcome classes: Home / Draw / Away</p>
         </div>
         <div className="p-6 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:shadow-lg transition-shadow">
-          <div className="text-4xl font-bold text-purple-700">74.3%</div>
-          <p className="text-sm text-purple-600 mt-3 font-medium">Model Accuracy</p>
+          <div className="text-4xl font-bold text-purple-700">61.5%</div>
+          <p className="text-sm text-purple-600 mt-3 font-medium">Production multiclass accuracy on the held-out test set</p>
         </div>
       </section>
 
@@ -98,10 +98,10 @@ export default function Home(){
       <section className="card mb-6 bg-gray-50">
         <h2 className="text-2xl font-bold mb-4">Problem Statement</h2>
         <p className="text-gray-700 mb-4">
-          Home field advantage (HFA) is a well-documented phenomenon in sports where teams playing at home win more frequently than expected. The COVID-19 pandemic provided a unique natural experiment: Premier League matches were played without crowds for an entire season.
+          Home field advantage (HFA) is a well-documented phenomenon in sports where teams playing at home tend to perform differently than away sides. The COVID-19 pandemic provided a useful comparison period: Premier League matches were played without crowds for part of the season.
         </p>
         <p className="text-gray-700">
-          This thesis uses machine learning and SHAP explainability to quantify the specific contribution of crowd presence to match outcomes, controlling for team quality, match statistics, and temporal factors.
+          This project uses match statistics, a binary crowd indicator, and SHAP explainability to examine how crowd presence is associated with outcomes in the available dataset, without claiming causal proof.
         </p>
       </section>
 

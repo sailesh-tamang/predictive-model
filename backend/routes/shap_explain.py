@@ -41,27 +41,27 @@ def shap_explain():
         explainer = shap.Explainer(MODEL)
         expl = explainer(X)
 
-        # handle multi-output shapes: for multiclass, vals is (samples x classes x features) 
+        # handle multi-output shapes: for multiclass, SHAP values are typically
+        # (samples, features, classes). We must extract the feature contributions
+        # for the class that the model predicted.
         vals = expl.values
         base = expl.base_values
-        
-        # Extract and flatten properly using numpy operations
+
         try:
             if isinstance(vals, list):
-                # vals is a list of arrays per class
+                # SHAP sometimes returns a list of arrays per class.
                 raw_vals = vals[pred_idx]
                 shap_vals = np.asarray(raw_vals).flatten().tolist()
             elif len(vals.shape) == 3:
-                # vals is (samples x classes x features) - multiclass output from SHAP
-                shap_vals = vals[0, pred_idx, :].flatten().tolist()
+                # Shape is (samples, features, classes) for multiclass explanations.
+                # Select the predicted class along the final axis and keep all features.
+                shap_vals = vals[0, :, pred_idx].flatten().tolist()
             elif len(vals.shape) == 2:
-                # vals is (samples x features)
+                # Binary or single-output case: (samples, features)
                 shap_vals = vals[0, :].flatten().tolist()
             else:
-                # fallback
                 shap_vals = np.atleast_1d(vals).flatten().tolist()
-        except Exception as flatten_err:
-            # Last resort: manual conversion
+        except Exception:
             shap_vals = [float(v) for v in np.asarray(vals).flatten()]
         
         # Convert base_value
@@ -110,12 +110,12 @@ def shap_plot():
         proba = MODEL.predict_proba(X)[0]
         pred_idx = int(np.argmax(proba))
 
-        # Extract SHAP values for the predicted class
+        # Extract the feature contribution vector for the predicted class.
         if isinstance(vals, list):
             raw_vals = vals[pred_idx]
             shap_values = np.asarray(raw_vals).flatten().tolist()
         elif len(vals.shape) == 3:
-            shap_values = vals[0, pred_idx, :].flatten().tolist()
+            shap_values = vals[0, :, pred_idx].flatten().tolist()
         elif len(vals.shape) == 2:
             shap_values = vals[0, :].flatten().tolist()
         else:

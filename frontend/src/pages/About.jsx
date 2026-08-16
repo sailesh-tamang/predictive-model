@@ -88,20 +88,20 @@ export default function About(){
       <section className="card">
         <h3 className="text-2xl font-semibold mb-4">Key Findings</h3>
         <div className="space-y-3 text-gray-700">
-          <p><strong>1. Crowd Effect Confirmation:</strong> Crowd presence significantly increases home win probability; matches with crowds show measurably higher HFA than no-crowd matches.</p>
-          <p><strong>2. COVID Natural Experiment:</strong> The 2020-21 no-crowd season provides compelling evidence: home advantage was reduced in the absence of crowds.</p>
-          <p><strong>3. Feature Importance:</strong> SHAP analysis confirms crowd presence as a top-3 feature for predicting match outcomes, alongside shots and fouls.</p>
-          <p><strong>4. Model Generalization:</strong> Cross-validated model achieves 50-60% accuracy on 3-way classification, significantly outperforming random baseline (33%).</p>
+          <p><strong>1. Observed Association:</strong> Crowd presence is associated with a difference in the observed home-win pattern when compared with no-crowd matches in the dataset.</p>
+          <p><strong>2. COVID Natural Experiment:</strong> The 2020-21 no-crowd season provides a useful comparison period within the available data, but the crowd variable remains a binary proxy rather than a continuous attendance measure.</p>
+          <p><strong>3. Feature Importance:</strong> SHAP analysis shows that crowd presence contributes to model predictions alongside other in-match features, but this remains an association-based interpretation rather than causal proof.</p>
+          <p><strong>4. Production Model Performance:</strong> The deployed multiclass model achieved 61.5% accuracy on the held-out test set for Home / Draw / Away prediction.</p>
         </div>
       </section>
 
       <section className="card">
         <h3 className="text-2xl font-semibold mb-4">Conclusions</h3>
         <p className="text-gray-700 mb-4">
-          This thesis provides quantitative evidence that crowd presence is a material contributor to home field advantage in professional football. By combining machine learning, natural experiment methodology, and explainable AI techniques, the research demonstrates that fans measurably influence match outcomes beyond random chance.
+          This project provides an observational and predictive analysis of how crowd presence is associated with home field advantage in Premier League matches. By combining match statistics, a binary crowd indicator, and explainable AI, the research examines patterns within the available dataset without claiming causal proof.
         </p>
         <p className="text-gray-700">
-          The application of SHAP values offers interpretable, stakeholder-friendly insights into model predictions, bridging the gap between statistical rigor and practical understanding.
+          The application of SHAP values offers interpretable insight into model predictions, while recognising that the analysis remains descriptive and predictive rather than causal.
         </p>
       </section>
 

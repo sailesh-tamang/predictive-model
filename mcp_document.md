@@ -2,778 +2,442 @@
 
 ## 1. Project Overview
 
-This project is a full-stack machine learning application built around a research question in football analytics:
+This project investigates how crowd presence is associated with home field advantage in the English Premier League. It combines:
 
-"How does crowd presence affect home field advantage in the English Premier League?"
+- historical EPL match data from the 2018/19 to 2021/22 seasons,
+- a binary research pipeline using home_win as the target,
+- a deployed multiclass production model using FTR (Home / Draw / Away),
+- SHAP-based explainability,
+- a Flask backend API,
+- a React + Vite frontend.
 
-The application combines:
-- historical Premier League data from 2018-2022,
-- a trained multiclass machine learning model,
-- an explainable AI layer using SHAP,
-- a Flask API backend,
-- a React + Vite frontend dashboard and prediction interface.
+The project has two distinct analytical tasks:
 
-This project acts as both:
-1. a research thesis artifact, and
-2. a working web application that allows users to input match statistics and get AI-based predictions with explanations.
+1. Binary research task: home_win vs no home win
+2. Production web-app task: FTR = H / D / A
 
-The core idea is to determine whether the presence or absence of a crowd changes the probability of a home win, draw, or away win, using actual match statistics as model inputs.
-
----
-
-## 2. What the Application Does
-
-The app allows a user to:
-- open a web dashboard,
-- view research insights and season-level analysis,
-- enter in-match statistics for a hypothetical or real football match,
-- receive a prediction from a machine-learning model for the match outcome,
-- inspect probability scores for Home Win / Draw / Away Win,
-- see SHAP feature contributions that explain which inputs pushed the prediction,
-- analyze charts explaining crowd effects over seasons and teams.
-
-The app is designed to answer a thesis-style question:
-- Does crowd presence materially influence match outcomes?
-- Is the impact measurable and explainable using AI?
+The project is therefore both a research artifact and a working predictive application, but the two tasks must be reported separately.
 
 ---
 
-## 3. Business and Research Context
+## 2. Project Purpose and Scope
 
-The project uses the COVID-19 period as a natural experiment:
-- normal matches with crowds,
-- ghost matches without crowds,
-- comparison between home win rates, goals, and other indicators.
+The overall research question is:
 
-This helps estimate how fans affect home advantage. In football, home field advantage is often attributed to a mix of travel fatigue, familiarity, referee bias, crowd energy, and psychological support. This project focuses on the crowd effect as a measurable variable.
+"How is crowd presence associated with home advantage in the Premier League?"
 
-The research uses machine learning not only for prediction but also for explainability. The model is not just a black box; it shows why a prediction happened.
+The application supports this by:
+- comparing match outcomes under crowd-present vs no-crowd conditions,
+- training a machine-learning model for Home / Draw / Away prediction,
+- explaining model decisions using SHAP,
+- presenting analysis dashboards and predictions through a web app.
 
----
-
-## 4. High-Level Architecture
-
-The project has a classic data-science + web-app structure:
-
-1. Data preparation scripts
-   - merge raw season CSVs into one master file
-   - clean and engineer features
-   - generate the final dataset used for modeling
-
-2. Model training and artifact generation
-   - train a multiclass XGBoost model
-   - save the model, scaler, and feature metadata
-
-3. Flask API backend
-   - load trained artifacts
-   - accept JSON input from frontend
-   - return labels, probabilities, SHAP values, and images
-
-4. React frontend
-   - present the app UI
-   - allow predictions
-   - show dashboards and visual analysis
-
-5. Static analysis assets
-   - charts and visualizations are saved as PNG images
-   - served through the Flask API and displayed inside the frontend
+This is not a causal-inference study and should not be described as proving causation. The project is observational and descriptive, with supervised prediction and explainability.
 
 ---
 
-## 5. Main Project Structure
+## 3. Two Separate ML Tasks
 
-### Root folder
-- README.md
-  - basic setup and project summary
-- DEPLOYMENT.md
-  - production deployment instructions for Render and Vercel
-- merge_data.py
-  - merges the four EPL CSV files into one master dataset
-- clean_data.py
-  - filters to relevant columns and creates crowd_present, home_win, and derived metrics
-- crowd_impact.py
-  - measures how crowd presence affects home win rate, goals, referee actions, and feature importance
-- season_analysis.py
-  - analyzes results by season and creates season-level charts
-- team_analysis.py
-  - compares crowd impact by club and generates team-level plots
-- model.py
-  - exploratory model comparison script (Logistic Regression, Random Forest, XGBoost)
-- EPL_master.csv
-  - combined dataset across seasons
-- EPL_cleaned.csv
-  - cleaned and engineered dataset for modeling
-- EPL_2018_19.csv through EPL_2021_22.csv
-  - raw season-specific data files
+### 3.1 Binary Research Model
 
-### Backend folder
-- app.py
-  - Flask app factory and route registration
-- requirements.txt
-  - Python dependencies for backend
-- Procfile
-  - deployment command for gunicorn
-- README.md
-  - backend-specific setup instructions
-- routes/
-  - prediction API, SHAP endpoint, image serving
-- model/
-  - trained model artifacts and metadata
+Target:
+- home_win
 
-### Frontend folder
-- package.json
-  - React app dependencies and scripts
-- src/
-  - app UI and pages
-- public/
-  - static assets (if any)
-- vite.config.js
-  - Vite settings
-- tailwind.config.js
-  - Tailwind styling configuration
-- index.html
-  - app HTML shell
+Meaning:
+- 1 = home win
+- 0 = draw or away win
+
+Purpose:
+- exploratory model comparison,
+- crowd-impact analysis,
+- descriptive research scripts.
+
+This is the task used in root research scripts such as model.py and crowd_impact.py.
+
+### 3.2 Production Multiclass Model
+
+Target:
+- FTR
+
+Classes:
+- H = Home Win
+- D = Draw
+- A = Away Win
+
+Purpose:
+- deployed web-app prediction,
+- Home / Draw / Away probability output,
+- frontend prediction flow.
+
+This is the model trained in backend/model/save_model.py and used by the API.
+
+The project must clearly distinguish these tasks. Their metrics must not be mixed.
 
 ---
 
-## 6. Data Pipeline
+## 4. Data Pipeline
 
-### 6.1 Raw Data Sources
-The project uses individual season files:
+### 4.1 Raw Data Sources
+The repository includes season-level files:
 - EPL_2018_19.csv
 - EPL_2019_20.csv
 - EPL_2020_21.csv
 - EPL_2021_22.csv
 
-These are standard football match datasets containing match-level statistics and results.
+These are combined into a master dataset and then cleaned for modeling.
 
-### 6.2 Merge Stage
-The script merge_data.py does this:
-- loads each season CSV,
-- adds a season column,
-- concatenates all rows into one master dataset,
-- saves it as EPL_master.csv.
+### 4.2 Merge Stage
+The script merge_data.py combines the season files into one master dataset.
 
-This creates a unified dataset across multiple seasons.
+### 4.3 Cleaning Stage
+The script clean_data.py:
+- keeps the match-level features used in the project,
+- creates a crowd_present flag,
+- creates a home_win binary target,
+- derives additional fields such as goal_diff, total_goals, total_yellow, and total_shots,
+- saves the cleaned dataset as EPL_cleaned.csv.
 
-### 6.3 Cleaning Stage
-The script clean_data.py does the following:
-- reads EPL_master.csv,
-- keeps only relevant columns such as:
-  - Date
-  - HomeTeam
-  - AwayTeam
-  - FTHG
-  - FTAG
-  - FTR
-  - HS, AS
-  - HST, AST
-  - HF, AF
-  - HC, AC
-  - HY, AY
-  - HR, AR
-  - Referee
-  - season
-- creates crowd_present
-  - 1 = crowd present
-  - 0 = no crowd
-- creates home_win
-  - 1 if home team won
-  - 0 if draw or away win
-- adds derived columns:
-  - goal_diff
-  - total_goals
-  - total_yellow
-  - total_shots
-- checks missing values
-- saves the cleaned version to EPL_cleaned.csv
+### 4.4 Key Research Variable: crowd_present
+The current project uses a binary crowd flag:
+- crowd_present = 1 means crowd present
+- crowd_present = 0 means no crowd
 
-### 6.4 Why the crowd_present column matters
-The key natural experiment is:
-- matches from 2020-06-17 to 2021-05-23 were played behind closed doors,
-- all of those are marked as crowd_present = 0,
-- all other matches are crowd_present = 1.
+The value is currently generated using the COVID ghost-match window:
 
-This allows the research to compare home advantage under normal crowd conditions vs. no-crowd conditions.
+- matches from 2020-06-17 to 2021-05-23 are treated as no-crowd matches,
+- all other matches are treated as crowd-present matches.
+
+This methodology is a reproducible binary proxy, not a true attendance measurement.
+
+### 4.5 verified crowd data counts
+The cleaned dataset currently contains:
+- Total matches: 1520
+- Crowd present: 1048
+- No crowd: 472
+- Missing crowd values: 0
+- Invalid crowd values: 0
+
+This means crowd_present is internally valid as a binary field in {0, 1}.
+
+However, it remains a date-based proxy, not exact attendance or stadium occupancy data.
 
 ---
 
-## 7. Dataset Columns and Meaning
+## 5. Dataset Feature Set and Labels
 
-The model uses a subset of features from the cleaned matches dataset:
+The production model uses the following features:
 
 - crowd_present
-  - whether fans were present
 - HS
-  - home shots
 - AS
-  - away shots
 - HST
-  - home shots on target
 - AST
-  - away shots on target
 - HF
-  - home fouls
 - AF
-  - away fouls
 - HC
-  - home corners
 - AC
-  - away corners
 - HY
-  - home yellow cards
 - AY
-  - away yellow cards
 - HR
-  - home red cards
 - AR
-  - away red cards
 
-Target variable:
-- FTR = Full Time Result
-  - H = Home Win
-  - D = Draw
-  - A = Away Win
+These are the 13 input variables used in the deployed model.
 
-Derived classification target used in model training:
+The production target is FTR:
+- H = Home Win
+- D = Draw
+- A = Away Win
+
+The numeric mapping in the model is:
 - H -> 0
 - D -> 1
 - A -> 2
 
-This is stored in labels.json.
+This mapping is stored in labels.json and used for model training and runtime prediction.
 
 ---
 
-## 8. AI Model Details
+## 6. Mandatory fix: Train/Test Leakage
 
-### 8.1 Model Type
-The final deployed model is a multiclass XGBoost classifier.
+A leakage issue was identified in the production training workflow. The incorrect pattern was:
 
-The training script is located at:
+- fit scaler on the full dataset,
+- then split into train/test,
+- then train the model.
+
+This was corrected.
+
+The current production workflow is now:
+
+1. define X and y
+2. split into train/test with stratification
+3. fit StandardScaler only on X_train
+4. transform X_train and X_test using the fitted scaler
+5. train the XGBoost model
+6. evaluate on X_test
+
+This is the technically correct workflow and prevents information leakage from the test set into preprocessing.
+
+The production artifacts were regenerated after this correction.
+
+---
+
+## 7. Production Model Details
+
+### 7.1 Model Type
+The final deployed production model is a multiclass XGBoost classifier trained on FTR.
+
+### 7.2 Training Script
+The model is trained in:
 - backend/model/save_model.py
 
-It does the following:
-- reads EPL_cleaned.csv from the repository root,
-- defines the feature list,
-- maps target labels to numeric classes,
-- fills missing values with zeros,
-- uses StandardScaler to normalize the input features,
-- performs stratified train/test split,
-- trains an XGBoost model using objective='multi:softprob',
-- saves the trained artifact to backend/model/model.pkl
-
-### 8.2 Exact Model Configuration
+### 7.3 Hyperparameters
 The model is trained with:
-- objective: multi:softprob
-- num_class: 3
-- n_estimators: 200
-- learning_rate: 0.05
-- use_label_encoder: False
-- eval_metric: mlogloss
-- random_state: 42
+- objective = multi:softprob
+- num_class = 3
+- n_estimators = 200
+- learning_rate = 0.05
+- use_label_encoder = False
+- eval_metric = mlogloss
+- random_state = 42
 
-This means the model predicts probabilities for each class (Home/Draw/Away) and the output is a multiclass probability distribution.
-
-### 8.3 Why XGBoost
-XGBoost was selected because it is highly effective on tabular data like match statistics. It usually performs very well for structured sports data and is robust for outcome prediction tasks.
-
-### 8.4 Additional Exploratory Models
-The root file model.py tests multiple models:
-- Logistic Regression
-- Random Forest Classifier
-- XGBoost Classifier
-
-It compares them using:
-- Accuracy
-- ROC-AUC
-- Classification report
-
-This script served as the experimental comparison to justify the final deployed XGBoost model.
-
-### 8.5 Model Artifacts
-The backend model folder contains:
+### 7.4 Production Artifacts
+The backend/model folder contains:
 - model.pkl
-  - trained XGBoost classifier
 - scaler.pkl
-  - StandardScaler fitted on training data
 - features.json
-  - ordered list of feature names used by the model
 - labels.json
-  - mapping between class names and numeric labels
+- model_metrics.json
 
-The loaded artifacts are used at runtime by the backend.
-
----
-
-## 9. Model Input and Output
-
-### Input features
-The model takes a JSON payload shaped like this:
-
-```json
-{
-  "crowd_present": 1,
-  "HS": 11,
-  "AS": 9,
-  "HST": 5,
-  "AST": 4,
-  "HF": 12,
-  "AF": 10,
-  "HC": 6,
-  "AC": 4,
-  "HY": 1,
-  "AY": 2,
-  "HR": 0,
-  "AR": 0
-}
-```
-
-### Output from prediction API
-The API returns:
-- probabilities
-- predicted outcome label
-- confidence score
-
-Example response:
-
-```json
-{
-  "probabilities": {
-    "H": 0.48,
-    "D": 0.22,
-    "A": 0.30
-  },
-  "predicted": "H",
-  "confidence": 0.48
-}
-```
-
-The actual backend code converts numeric class indices back into labels H/D/A using labels.json.
+These artifacts are used by the Flask backend at runtime.
 
 ---
 
-## 10. Explainable AI: SHAP
+## 8. Production Model Performance (Verified)
 
-### 10.1 What SHAP means
-SHAP stands for SHapley Additive exPlanations.
+The trained production model was evaluated on the hold-out test set after the leakage fix.
 
-SHAP is used to explain the contribution of each feature to the model’s prediction. It answers questions like:
-- Which variables pushed the decision toward home win?
-- Did crowd presence matter strongly?
-- Was a bad performance caused by low shots or high fouls?
+Key metrics:
+- Accuracy: 0.6151
+- Macro F1: 0.5409
+- Weighted F1: 0.5920
+- ROC-AUC (macro OVR): 0.7452
 
-### 10.2 SHAP Integration in this Project
-The backend exposes:
-- /api/shap
-  - returns SHAP values for a given prediction as JSON
-- /api/shap_plot
-  - returns a PNG image of the top feature contributions
+Per-class metrics:
 
-The SHAP logic uses:
+Home (H)
+- Precision: 0.6460
+- Recall: 0.7879
+- F1: 0.7099
+
+Draw (D)
+- Precision: 0.3611
+- Recall: 0.1940
+- F1: 0.2524
+
+Away (A)
+- Precision: 0.6542
+- Recall: 0.6667
+- F1: 0.6604
+
+These metrics are stored in backend/model/model_metrics.json and are the real production results for the multiclass prediction task.
+
+---
+
+## 9. Confusion Matrix
+
+The confusion matrix for the production model is:
+
+[[104, 13, 15],
+ [32, 13, 22],
+ [25, 10, 70]]
+
+Interpretation:
+- Home wins are the strongest-performing class.
+- Draws are the most difficult class to classify.
+- The model struggles most with Draw outcomes, which is visible in the low Draw recall and low Draw F1.
+
+This limitation should be reported honestly rather than hidden.
+
+---
+
+## 10. Binary Research Model vs Production Model
+
+These are separate tasks and should not be reported as the same metric set.
+
+### 10.1 Binary research model
+- Target: home_win
+- Task: Home Win vs No Home Win
+- Purpose: exploratory research, model comparison, crowd-impact analysis
+
+### 10.2 Production web-app model
+- Target: FTR
+- Task: Home vs Draw vs Away
+- Purpose: deployed prediction API and frontend interaction
+
+### 10.3 Reporting rule
+The binary model performance and the multiclass production performance must remain separate. The binary model is not the application prediction model.
+
+---
+
+## 11. Explainable AI: SHAP
+
+### 11.1 SHAP purpose
+SHAP is used to explain the contribution of each input feature to a prediction.
+
+The deployment uses:
 - shap.Explainer(MODEL)
 - MODEL.predict_proba(X)
-- extraction of the predicted class index
-- flattening SHAP values per feature
+- predicted class selection
+- per-feature contribution extraction
 
-### 10.3 SHAP value behavior
-For multiclass predictions, SHAP values are class-specific. The code calculates the predicted class and then extracts the SHAP contributions for that class only.
+### 11.2 SHAP shape for multiclass XGBoost
+The project uses a multiclass XGBoost model with 13 features and 3 output classes.
 
-This means the explanation is tied to the actual class the model chose. For example:
-- if the model predicts Home Win, SHAP values are extracted for the Home class contribution
+The verified SHAP object shape is:
+- (1, 13, 3)
 
-### 10.4 Visual outputs
-The project also serves static SHAP plots and dashboard screenshots, including:
-- SHAP summary plot
-- SHAP bar plot
-- crowd-specific SHAP analysis
+This means:
+- 1 sample,
+- 13 features,
+- 3 classes.
 
-These are displayed in the frontend SHAP page and dashboard page.
+The endpoint must extract the feature contributions for the class actually predicted by the model, not assume the wrong axis.
+
+### 11.3 Correct extraction logic
+The corrected logic selects the predicted class and keeps all 13 feature values for that class.
+
+For a single prediction:
+- predicted class = H, D, or A
+- number of features = 13
+- number of SHAP contributions returned = 13
+
+This requirement is now satisfied in the backend.
+
+### 11.4 SHAP endpoints
+The backend exposes:
+- /api/shap
+- /api/shap_plot
+
+Both endpoints are expected to work with the trained multiclass model.
 
 ---
 
-## 11. Backend Architecture
+## 12. Flask Backend Architecture
 
-### 11.1 Framework
 The backend is built with Flask.
 
-The main app file is backend/app.py.
+Key files:
+- backend/app.py
+- backend/routes/predict.py
+- backend/routes/shap_explain.py
+- backend/model/model_utils.py
 
-It registers three blueprints:
-- predict
-- images
-- shap
+### 12.1 Prediction endpoint
+The /api/predict route:
+- loads the trained model and scaler,
+- prepares the input using feature order from features.json,
+- fills missing values with zero,
+- applies the scaler,
+- predicts probabilities,
+- maps numeric outputs back to H/D/A labels,
+- returns probabilities, predicted class, and confidence.
 
-This keeps the endpoints organized and modular.
+### 12.2 SHAP endpoint
+The /api/shap route returns:
+- base_value,
+- feature_names,
+- shap_values,
+- predicted_class_index,
+- predicted_label
 
-### 11.2 App entry point
-The root app logic:
-- creates a Flask app using create_app()
-- enables CORS
-- imports blueprints
-- registers them under /api
-- exposes a root endpoint returning status
-
-### 11.3 Route files
-
-#### routes/predict.py
-This is the main prediction endpoint.
-
-It does:
-- load trained model artifacts from backend/model,
-- accept user JSON payload,
-- prepare input using prepare_input,
-- transform features with scaler if available,
-- run MODEL.predict_proba,
-- map numeric outputs back to H/D/A labels,
-- return probabilities and confidence.
-
-#### routes/shap_explain.py
-This file handles explainability.
-
-It provides:
-- /api/shap
-  - returns feature names and SHAP contribution values
-- /api/shap_plot
-  - creates and returns a PNG of SHAP contributions
-
-The plot is generated using matplotlib and the saved figure is sent as a static image.
-
-#### routes/images.py
-This file serves image assets from the project root.
-
-It provides:
-- /api/images/list
-  - returns a list of available plot files
-- /api/images/<filename>
-  - returns an image file from the project folder
-
-This allows the frontend to display charts generated from research analysis.
+### 12.3 SHAP plot endpoint
+The /api/shap_plot route generates a PNG and returns it to the frontend.
 
 ---
 
-## 12. Backend Utility Functions
+## 13. Frontend Role
 
-The file backend/model/model_utils.py contains the core loading and transformation code.
+The frontend is a React + Vite application.
 
-### Function: load_artifacts
-This function:
-- locates model.pkl, scaler.pkl and features.json inside backend/model,
-- loads the trained XGBoost model and StandardScaler,
-- loads labels.json if available,
-- returns model, scaler, features and labels.
+It consumes the backend for:
+- prediction results,
+- SHAP explanations,
+- SHAP plot image,
+- research dashboard visuals.
 
-### Function: prepare_input
-This function:
-- takes user payload JSON,
-- iterates through feature names in order,
-- maps missing fields to 0,
-- converts values to float,
-- builds a pandas DataFrame,
-- applies scaler transform if scaler is provided,
-- returns a DataFrame ready for model input.
-
-This is important because the model expects consistent features in exact order.
+The frontend is not redesigned in this task. It remains a working interface for the deployed model and the research dashboard.
 
 ---
 
-## 13. Frontend Architecture
+## 14. Causal and Academic Wording
 
-The frontend is built with React and Vite.
+The project uses observational data and predictive modeling. It should not claim causation.
 
-### Main files
-- App.jsx
-  - navigation and page routing
-- src/api.js
-  - API base URL logic
-- pages/Home.jsx
-  - landing page with summary and CTA
-- pages/Predict.jsx
-  - match prediction form with probability bars and SHAP results
-- pages/Dashboard.jsx
-  - charts and visual analysis of crowd impact
-- pages/SHAP.jsx
-  - SHAP explainability visualizations
-- pages/About.jsx
-  - methodology and thesis content
+Correct academic wording:
+- “Crowd presence was associated with stronger home advantage in the analysed matches.”
+- “The observed pattern is consistent with a possible association between crowd presence and referee-related match outcomes.”
 
-### Styling
-The frontend uses Tailwind CSS to create a clean dashboard aesthetic.
+The project should describe associations, not proof of causality.
 
-### Navigation
-Routes include:
-- /
-- /predict
-- /dashboard
-- /shap
-- /about
-
-### Main user flows
-1. User visits Home page
-2. User clicks Predict or enters match stats
-3. Frontend posts to /api/predict
-4. Backend returns predicted class and probabilities
-5. Frontend also calls /api/shap and /api/shap_plot
-6. UI displays prediction plus explainability
-7. User can navigate to research dashboards and charts
+This applies to documentation and explanatory messaging in the project.
 
 ---
 
-## 14. Frontend Prediction Page Behavior
+## 15. Limitations and Future Work
 
-The Predict page allows the user to fill in:
-- crowd_present
-- HS, AS
-- HST, AST
-- HF, AF
-- HC, AC
-- HY, AY
-- HR, AR
+The following are intentionally not implemented in this task:
+- other leagues,
+- longer time coverage,
+- real attendance counts,
+- stadium occupancy proportion modeling,
+- crowd-noise data,
+- difference-in-differences,
+- causal inference models,
+- live betting or odds integration,
+- deep learning or LSTM models,
+- user authentication,
+- major frontend redesign,
+- generative AI features.
 
-After submission:
-- prediction request goes to the API,
-- result is displayed with a label and probability bars,
-- explanation request retrieves SHAP values,
-- SHAP plot image may be generated and shown,
-- model confidence is displayed as a percentage.
-
-Visual logic in the frontend:
-- Home Win = green styling
-- Draw = yellow styling
-- Away Win = red styling
-
-This helps the end user quickly understand predictions.
+These remain limitations or future work items, not part of the current project scope.
 
 ---
 
-## 15. Dashboard and Research Visualization
+## 16. Validation and Working Status
 
-The app includes the following analysis charts:
+The application was validated after the fixes:
 
-- season_analysis.png
-  - compares home win rates by season
-- team_analysis.png
-  - team-by-team crowd impact visualizations
-- crowd_impact.png
-  - overall effect of crowd presence on match outcomes
-- team_scatter.png
-  - scatter plot comparing home win rates with and without crowd
+- /api/predict: PASS
+- /api/shap: PASS
+- /api/shap_plot: PASS
 
-These are served by the backend and shown in the Dashboard and SHAP pages.
+Additional verified checks:
+- prediction probabilities sum approximately to 1: PASS
+- SHAP contribution count matches feature count: PASS
 
-These visuals are essential to the thesis narrative because they provide empirical evidence that crowd impact is real and measurable.
+The production pipeline remains functional after retraining and regeneration of model artifacts.
 
 ---
 
-## 16. Project Scripts and Their Roles
+## 17. Final Summary
 
-### merge_data.py
-Purpose:
-- combine the four season datasets
-- generate a master compilation for research
+This project is a football analytics and predictive modeling application focused on the relationship between crowd presence and home advantage in the Premier League.
 
-### clean_data.py
-Purpose:
-- prepare the cleaned dataset for modeling
-- engineer crowd and home-win variables
-
-### crowd_impact.py
-Purpose:
-- analyze average home win rate with vs without crowd
-- compare goals and yellow cards
-- fit a RandomForest model to estimate important features
-- save a crowd impact chart
-
-### season_analysis.py
-Purpose:
-- report home win rate, goals, and cards by season
-- visualize season-level patterns and COVID ghost season effect
-
-### team_analysis.py
-Purpose:
-- analyze which teams are most affected by crowd removal
-- visualize team-level home win rate shifts
-
-### model.py
-Purpose:
-- compare production candidate models
-- evaluate prediction quality
-
-### backend/model/save_model.py
-Purpose:
-- final model training pipeline for deployment
-- saves XGBoost artifact used in API
-
----
-
-## 17. Technical Dependencies
-
-### Python dependencies from backend/requirements.txt
-- flask
-- flask-cors
-- pandas
-- numpy
-- scikit-learn
-- xgboost
-- joblib
-- gunicorn
-- shap
-- matplotlib
-
-### Frontend dependencies from frontend/package.json
-- react
-- react-dom
-- react-router-dom
-- axios
-- vite
-- tailwindcss
-- postcss
-- autoprefixer
-
-These dependencies collectively support:
-- data handling,
-- AI model execution,
-- API serving,
-- visual analysis,
-- frontend routing,
-- styling.
-
----
-
-## 18. Runtime Workflows
-
-### Local backend workflow
-1. Create a virtual environment
-2. Install requirements from backend/requirements.txt
-3. Run python backend/model/save_model.py
-4. Start backend with python backend/app.py
-5. API becomes available at http://localhost:5000/api
-
-### Local frontend workflow
-1. Go to frontend/
-2. Run npm install
-3. Run npm run dev
-4. Access frontend at http://localhost:5173
-
-### Typical user interaction
-1. User enters match stats in the prediction form
-2. Frontend sends POST to /api/predict
-3. Flask loads model artifacts and scales input
-4. XGBoost predicts class probabilities
-5. API sends result back to frontend
-6. Frontend also requests SHAP explanations
-7. User sees the predicted outcome, confidence, and feature importance
-
----
-
-## 19. Deployment Overview
-
-The project is intended to be deployed in two components:
-
-### Backend deployment
-- likely hosted on Render
-- uses gunicorn
-- served through app:create_app or wsgi
-
-### Frontend deployment
-- likely hosted on Vercel
-- uses Vite build output
-- connects to backend API through VITE_API_URL
-
-The deployment guide in DEPLOYMENT.md includes:
-- local dev commands,
-- Render configuration,
-- Vercel environment variable setup,
-- verification steps for prediction endpoints.
-
----
-
-## 20. AI / ML Interpretation of the Project
-
-This project is not a generic chatbot or LLM application.
-
-It is a classical machine learning project with:
-- structured tabular input,
-- supervised classification,
-- XGBoost learning from historical match features,
-- probability-based prediction,
-- SHAP-based interpretability.
-
-In plain terms:
-"The app learns from historical Premier League matches and predicts likely game outcomes using features like shots, corners, fouls, cards, and crowd status. It explains its prediction by showing which factors contributed the most."
-
-This is a strong example of applied AI in sports analytics and research.
-
----
-
-## 21. Key Research Findings Reflected in the App
-
-The product and UI are built around the thesis findings:
-- crowd presence changes home win probability,
-- home advantage is diminished without crowd support,
-- seasons with ghost matches show altered outcomes,
-- clubs differ in how strongly crowd presence affects them,
-- SHAP values show crowd presence as a meaningful contributor to model explanations,
-- AI helps quantify and visualize that relationship.
-
-These findings are represented in the landing page, dashboard, SHAP section, and the overall narrative of the project.
-
----
-
-## 22. Important Implementation Notes
-
-- The final production model is trained in backend/model/save_model.py, not in the root model.py file.
-- The backend loads artifacts at import time for the blueprint routes.
-- If model artifacts are missing, the prediction endpoint returns a helpful error message.
-- Input features must match the exact feature order saved in features.json.
-- SHAP is optional at runtime; if not installed, the SHAP endpoint returns an error.
-- Model labels are mapped from H/D/A to numeric values internally and back again for the API.
-
----
-
-## 23. Example of Full Data Flow
-
-1. Data is merged and cleaned.
-2. Crowd presence is added via date logic.
-3. A CSV dataset is created.
-4. Training script loads the dataset.
-5. Features are scaled.
-6. XGBoost trains a multiclass classifier.
-7. Model and scaler are saved.
-8. Flask app loads these artifacts.
-9. User posts match statistics.
-10. Backend prepares the input.
-11. Model predicts probabilities for Home/Draw/Away.
-12. SHAP explains the prediction.
-13. Frontend shows result and charts.
-14. User views a dashboard explaining the broader crowd impact.
-
----
-
-## 24. Summary
-
-This project is a complete machine-learning and explainability application for analyzing the effect of crowd presence on Premier League home field advantage.
-
-It combines:
-- sports research,
-- data engineering,
-- supervised learning,
-- XGBoost modeling,
+It contains:
+- a binary research model for home_win,
+- a multiclass production model for FTR,
+- descriptive analysis of crowd impact,
 - SHAP explainability,
-- Flask API backend,
-- React frontend,
-- dashboard visualizations,
-- deployment-ready architecture.
+- a Flask backend API,
+- a React frontend.
 
-Anyone reading this document should be able to understand:
-- what the app does,
-- how the data is prepared,
-- how the model is trained and saved,
-- how the backend APIs work,
-- how the frontend consumes the model,
-- why the project matters as both a research and product example.
+The key technical corrections made were:
+- fix preprocessing leakage by fitting the scaler only on X_train,
+- correct the multiclass SHAP extraction so that it returns all feature contributions for the predicted class,
+- regenerate the production model artifacts and metrics,
+- separate the binary research task from the deployed multiclass task,
+- keep wording academically defensible and avoid causal overstatement.
 
----
+This is an appropriate final-year project structure for a reproducible, explainable sports analytics result.
 
-## 25. Final One-Line Description
-
-EPL Crowd Impact is a football analytics and AI-powered prediction app that studies how crowd presence changes home field advantage in the Premier League, using XGBoost for multiclass outcome prediction and SHAP for explainable insights.
